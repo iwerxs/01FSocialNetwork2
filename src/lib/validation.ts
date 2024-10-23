@@ -1,5 +1,6 @@
 //src/lib/validation.ts
 //Validation Schemas
+import { getDisplayName } from "next/dist/shared/lib/utils";
 import { z } from "zod";
 
 const requiredString = z.string().trim().min(1, "Required");
@@ -26,3 +27,11 @@ export type LoginValues = z.infer<typeof loginSchema>;
 export const createPostSchema = z.object({
   content: requiredString,
 });
+
+//validation schema for uploadthing
+export const updateUserProfileSchema = z.object({
+  getDisplayName: requiredString,
+  bio: z.string().max(1000, "Bio max 1000 characters only"),
+});
+
+export type UpdateUserProfileValues = z.infer<typeof updateUserProfileSchema>;
