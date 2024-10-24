@@ -30,7 +30,7 @@ export const createPostSchema = z.object({
 
 //validation schema for uploadthing
 export const updateUserProfileSchema = z.object({
-  getDisplayName: requiredString,
+  displayName: requiredString,
   bio: z.string().max(1000, "Bio max 1000 characters only"),
 });
 
