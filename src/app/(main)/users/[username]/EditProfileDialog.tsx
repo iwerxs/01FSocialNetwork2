@@ -32,6 +32,8 @@ import { useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
 import { Camera } from "lucide-react";
+import CropImageDialog from "@/components/CropImageDialog";
+import Resizer from "react-image-file-resizer";
 
 interface EditProfileDialogProps {
   user: UserData;
@@ -59,10 +61,16 @@ export default function EditProfileDialog({
 
   // submit via a js object
   async function onSubmit(values: UpdateUserProfileValues) {
+    // return cropped avatar file to frontend
+    const newAvatarFile = croppedAvatar
+      ? new File([croppedAvatar], `avatar_${user.id}.webp`)
+      : undefined;
+
     mutation.mutate(
-      { values },
+      { values, avatar: newAvatarFile },
       {
         onSuccess: () => {
+          setCroppedAvatar(null);
           onOpenChange(false);
         },
       },
@@ -135,7 +143,7 @@ export default function EditProfileDialog({
 
 interface AvatarInputProps {
   src: string | StaticImageData;
-  onImageCropped: (blob: Blob) => void;
+  onImageCropped: (blob: Blob | null) => void;
 }
 
 function AvatarInput({ src, onImageCropped }: AvatarInputProps) {
@@ -145,7 +153,16 @@ function AvatarInput({ src, onImageCropped }: AvatarInputProps) {
 
   function onImageSelected(image: File | undefined) {
     if (!image) return;
-    // setImageToCrop(image);
+    Resizer.imageFileResizer(
+      image,
+      1024,
+      1024,
+      "WEBP",
+      100,
+      0,
+      (uri) => setImageToCrop(uri as File),
+      "file",
+    );
   }
   return (
     <>
@@ -172,6 +189,19 @@ function AvatarInput({ src, onImageCropped }: AvatarInputProps) {
           <Camera size={22} />
         </span>
       </button>
+      {imageToCrop && (
+        <CropImageDialog
+          src={URL.createObjectURL(imageToCrop)}
+          cropAspectRatio={1}
+          onCropped={onImageCropped}
+          onClose={() => {
+            setImageToCrop(undefined);
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+          }}
+        />
+      )}
     </>
   );
 }

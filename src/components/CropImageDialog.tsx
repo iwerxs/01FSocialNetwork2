@@ -2,7 +2,14 @@
 import { useRef } from "react";
 import { Cropper, ReactCropperElement } from "react-cropper";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import "cropperjs/dist/cropper.css";
 
 interface CropImageDialogProps {
   src: string;
@@ -28,7 +35,9 @@ export default function CropImageDialog({
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
-        <DialogHeader>Crop Image</DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Crop image</DialogTitle>
+        </DialogHeader>
         <Cropper
           src={src}
           ref={cropperRef}
@@ -37,6 +46,12 @@ export default function CropImageDialog({
           zoomable={false}
           className="mx-auto size-fit"
         />
+        <DialogFooter>
+          <Button variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={crop}>Crop</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
