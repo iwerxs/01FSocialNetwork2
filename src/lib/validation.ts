@@ -26,6 +26,7 @@ export type LoginValues = z.infer<typeof loginSchema>;
 // validate posts
 export const createPostSchema = z.object({
   content: requiredString,
+  mediaIds: z.array(z.string()).max(4, "Max 4 media per post"),
 });
 
 //validation schema for uploadthing
