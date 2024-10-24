@@ -1,12 +1,13 @@
 //src/components/CropImageDialog.tsx
 import { useRef } from "react";
 import { Cropper, ReactCropperElement } from "react-cropper";
+import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader } from "./ui/dialog";
 
 interface CropImageDialogProps {
   src: string;
   cropAspectRatio: number;
-  onCropped: (blob: Blob) => void;
+  onCropped: (blob: Blob | null) => void;
   onClose: () => void;
 }
 
