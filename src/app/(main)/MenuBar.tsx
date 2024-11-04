@@ -21,7 +21,7 @@ export default function MenuBar({ className }: MenuBarProps) {
       >
         <Link href="/">
           <Home />
-          <span className="hidden lg:inline">Home</span>
+          <span className="hidden lg:inline">Posts</span>
         </Link>
       </Button>
       {/* Notification Button */}
