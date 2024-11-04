@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import "./styles.css";
 import { useSubmitPostMutation } from "./mutations";
 import LoadingButton from "@/components/LoadingButton";
-import useMediaUpload from "./useMediaUpload";
-import { ImageIcon } from "lucide-react";
+import useMediaUpload, { Attachment } from "./useMediaUpload";
+import { ImageIcon, Loader2, X } from "lucide-react";
 import { useRef } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export default function PostEditor() {
   const { user } = useSession();
@@ -73,7 +75,20 @@ export default function PostEditor() {
           className="max-h-[20rem] w-full overflow-y-auto rounded-2xl bg-background px-5 py-3"
         />
       </div>
+      {!!attachments.length && (
+        <AttachmentPreviews
+          attachments={attachments}
+          removeAttachment={removeAttachment}
+        />
+      )}
       <div className="flex items-center justify-end gap-3">
+        {/* display upload progress */}
+        {isUploading && (
+          <>
+            <span>{uploadProgress ?? 0}%</span>
+            <Loader2 className="size-5 animate-spin text-primary" />
+          </>
+        )}
         <AddAttachmentButton
           onFilesSelected={startUpload}
           disabled={isUploading || attachments.length >= 4}
@@ -81,7 +96,7 @@ export default function PostEditor() {
         <LoadingButton
           onClick={onSubmit}
           loading={mutation.isPending}
-          disabled={!input.trim()}
+          disabled={!input.trim() || isUploading}
           className="min-w-20"
         >
           Post
@@ -128,6 +143,78 @@ function AddAttachmentButton({
           }
         }}
       />
+    </>
+  );
+}
+
+// for UI
+interface AttachmentPreviewsProps {
+  attachments: Attachment[];
+  removeAttachment: (fileName: string) => void;
+}
+
+function AttachmentPreviews({
+  attachments,
+  removeAttachment,
+}: AttachmentPreviewsProps) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-3",
+        attachments.length > 1 && "sm:grid sm:grid-cols-2",
+      )}
+    >
+      {attachments.map((attachment) => (
+        <AttachmentPreview
+          key={attachment.file.name}
+          attachment={attachment}
+          onRemoveClick={() => removeAttachment(attachment.file.name)}
+        />
+      ))}
+    </div>
+  );
+}
+
+// preview the image upload
+interface AttachmentPreviewProps {
+  attachment: Attachment;
+  onRemoveClick: () => void;
+}
+
+function AttachmentPreview({
+  attachment: { file, mediaId, isUploading },
+  onRemoveClick,
+}: AttachmentPreviewProps) {
+  // preview url
+  const src = URL.createObjectURL(file);
+  return (
+    <>
+      <div
+        className={cn("relative mx-auto size-fit", isUploading && "opacity-50")}
+      >
+        {file.type.startsWith("image") ? (
+          <Image
+            src={src}
+            alt="Attachment preview"
+            width={500}
+            height={500}
+            className="size-fit max-h-[30rem] rounded-2xl"
+          />
+        ) : (
+          <video controls className="size-fit max-h-[30rem] rounded-2xl">
+            <source src={src} type={file.type} />
+          </video>
+        )}
+        {/* delete attachment */}
+        {!isUploading && (
+          <button
+            onClick={onRemoveClick}
+            className="absolute right-3 top-3 rounded-full bg-foreground p-2 text-background transition-colors hover:bg-foreground/60"
+          >
+            <X size={20} />
+          </button>
+        )}
+      </div>
     </>
   );
 }
