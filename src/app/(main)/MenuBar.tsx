@@ -1,15 +1,30 @@
 //src/app/(main)/MenuBar.tsx
 
+import { validateRequest } from "@/auth";
 import { Button } from "@/components/ui/button";
+import prisma from "@/lib/prisma";
+import { read } from "fs";
 import { Bell, Bookmark, Home, Mail } from "lucide-react";
 import Link from "next/link";
+import NotificationsButton from "./NotificationsButton";
 
 //style menu bar from outside of component
 interface MenuBarProps {
   className?: string;
 }
 
-export default function MenuBar({ className }: MenuBarProps) {
+export default async function MenuBar({ className }: MenuBarProps) {
+  const { user } = await validateRequest();
+
+  if (!user) return null;
+
+  const unreadNotificationCount = await prisma.notification.count({
+    where: {
+      recipientId: user.id,
+      read: false,
+    },
+  });
+
   return (
     <div className={className}>
       {/* Home Button */}
@@ -25,6 +40,9 @@ export default function MenuBar({ className }: MenuBarProps) {
         </Link>
       </Button>
       {/* Notification Button */}
+      <NotificationsButton
+        initialState={{ unreadCount: unreadNotificationCount }}
+      />
       <Button
         variant="ghost"
         className="flex items-center justify-start gap-3"

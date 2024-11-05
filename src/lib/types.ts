@@ -143,3 +143,8 @@ export interface LikeInfo {
 export interface BookmarkInfo {
   isBookmarkedByUser: boolean;
 }
+
+//used in route.ts 'unread-count' server
+export interface NotificationCountInfo {
+  unreadCount: number;
+}
