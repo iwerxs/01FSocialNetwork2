@@ -1,12 +1,9 @@
-//src/app/api/posts/[postId]/likes/route.ts
-//Server Endpoint for Like request, with a route handler
-
 import { validateRequest } from "@/auth";
 import prisma from "@/lib/prisma";
 import { LikeInfo } from "@/lib/types";
 
 export async function GET(
-  request: Request,
+  req: Request,
   { params: { postId } }: { params: { postId: string } },
 ) {
   try {
@@ -16,7 +13,6 @@ export async function GET(
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // post from db with the like info
     const post = await prisma.post.findUnique({
       where: { id: postId },
       select: {
@@ -35,7 +31,7 @@ export async function GET(
         },
       },
     });
-    // check if post exists
+
     if (!post) {
       return Response.json({ error: "Post not found" }, { status: 404 });
     }
@@ -44,61 +40,113 @@ export async function GET(
       likes: post._count.likes,
       isLikedByUser: !!post.likes.length,
     };
+
     return Response.json(data);
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function POST(
-  request: Request,
+  req: Request,
   { params: { postId } }: { params: { postId: string } },
 ) {
   try {
     const { user: loggedInUser } = await validateRequest();
+
     if (!loggedInUser) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.like.upsert({
-      where: {
-        userId_postId: {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: {
+        userId: true,
+      },
+    });
+
+    if (!post) {
+      return Response.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    await prisma.$transaction([
+      prisma.like.upsert({
+        where: {
+          userId_postId: {
+            userId: loggedInUser.id,
+            postId,
+          },
+        },
+        create: {
           userId: loggedInUser.id,
           postId,
         },
-      },
-      create: {
-        userId: loggedInUser.id,
-        postId,
-      },
-      update: {},
-    });
+        update: {},
+      }),
+      ...(loggedInUser.id !== post.userId
+        ? [
+            prisma.notification.create({
+              data: {
+                issuerId: loggedInUser.id,
+                recipientId: post.userId,
+                postId,
+                type: "LIKE",
+              },
+            }),
+          ]
+        : []),
+    ]);
+
     return new Response();
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: Request,
+  req: Request,
   { params: { postId } }: { params: { postId: string } },
 ) {
   try {
     const { user: loggedInUser } = await validateRequest();
+
     if (!loggedInUser) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
-    await prisma.like.deleteMany({
-      where: {
-        userId: loggedInUser.id,
-        postId,
+
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: {
+        userId: true,
       },
     });
+
+    if (!post) {
+      return Response.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    await prisma.$transaction([
+      prisma.like.deleteMany({
+        where: {
+          userId: loggedInUser.id,
+          postId,
+        },
+      }),
+      prisma.notification.deleteMany({
+        where: {
+          issuerId: loggedInUser.id,
+          recipientId: post.userId,
+          postId,
+          type: "LIKE",
+        },
+      }),
+    ]);
+
     return new Response();
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
