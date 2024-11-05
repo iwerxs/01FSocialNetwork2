@@ -1,6 +1,3 @@
-//src/components/comments/actions.ts
-//server actions for comments
-//always authenticate via the backend, never the frontend, as this can be manipulated.
 "use server";
 
 import { validateRequest } from "@/auth";
@@ -21,15 +18,49 @@ export async function submitComment({
 
   const { content: contentValidated } = createCommentSchema.parse({ content });
 
-  //use mutated cache for new comment
-  const newComment = await prisma.comment.create({
-    data: {
-      content: contentValidated,
-      userId: user.id,
-      postId: post.id,
-    },
+  const [newComment] = await prisma.$transaction([
+    prisma.comment.create({
+      data: {
+        content: contentValidated,
+        postId: post.id,
+        userId: user.id,
+      },
+      include: getCommentDataInclude(user.id),
+    }),
+    ...(post.user.id !== user.id
+      ? [
+          prisma.notification.create({
+            data: {
+              issuerId: user.id,
+              recipientId: post.user.id,
+              postId: post.id,
+              type: "COMMENT",
+            },
+          }),
+        ]
+      : []),
+  ]);
+
+  return newComment;
+}
+
+export async function deleteComment(id: string) {
+  const { user } = await validateRequest();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const comment = await prisma.comment.findUnique({
+    where: { id },
+  });
+
+  if (!comment) throw new Error("Comment not found");
+
+  if (comment.userId !== user.id) throw new Error("Unauthorized");
+
+  const deletedComment = await prisma.comment.delete({
+    where: { id },
     include: getCommentDataInclude(user.id),
   });
-  // update through React Queries via api, not a 'revalidate path'
-  return newComment;
+
+  return deletedComment;
 }

@@ -1,12 +1,9 @@
-//src/components/comments/CommentInput.tsx
-
 import { PostData } from "@/lib/types";
-import { use, useState } from "react";
-import { useSubmitCommentMutation } from "./mutations";
-import { Input } from "../ui/input";
-import { SendHorizonal } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Loader2, SendHorizonal } from "lucide-react";
+import { useState } from "react";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { useSubmitCommentMutation } from "./mutations";
 
 interface CommentInputProps {
   post: PostData;
@@ -32,6 +29,7 @@ export default function CommentInput({ post }: CommentInputProps) {
       },
     );
   }
+
   return (
     <form className="flex w-full items-center gap-2" onSubmit={onSubmit}>
       <Input
