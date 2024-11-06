@@ -1,10 +1,9 @@
-//src/auth.ts
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import prisma from "./lib/prisma";
+import { Google } from "arctic";
 import { Lucia, Session, User } from "lucia";
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { Google } from "arctic";
+import prisma from "./lib/prisma";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
@@ -59,6 +58,7 @@ export const validateRequest = cache(
         session: null,
       };
     }
+
     const result = await lucia.validateSession(sessionId);
 
     try {
@@ -79,6 +79,7 @@ export const validateRequest = cache(
         );
       }
     } catch {}
+
     return result;
   },
 );

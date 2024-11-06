@@ -1,12 +1,11 @@
 import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
 import { formatDate, formatDistanceToNowStrict } from "date-fns";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// relative time stamp function, hours, current year, past years.
 export function formatRelativeDate(from: Date) {
   const currentDate = new Date();
   if (currentDate.getTime() - from.getTime() < 24 * 60 * 60 * 1000) {
@@ -15,12 +14,11 @@ export function formatRelativeDate(from: Date) {
     if (currentDate.getFullYear() === from.getFullYear()) {
       return formatDate(from, "MMM d");
     } else {
-      return formatDate(from, "MMM d, yyyy");
+      return formatDate(from, "MMM d, yyy");
     }
   }
 }
 
-// format number abbreviation
 export function formatNumber(n: number): string {
   return Intl.NumberFormat("en-US", {
     notation: "compact",
@@ -28,7 +26,6 @@ export function formatNumber(n: number): string {
   }).format(n);
 }
 
-// lowercase google login
 export function slugify(input: string): string {
   return input
     .toLowerCase()

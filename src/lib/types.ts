@@ -32,13 +32,6 @@ export type UserData = Prisma.UserGetPayload<{
   select: ReturnType<typeof getUserDataSelect>;
 }>;
 
-// export const userDataSelect = {
-//   id: true,
-//   username: true,
-//   displayName: true,
-//   avatarUrl: true,
-// } satisfies Prisma.UserSelect;
-
 export function getPostDataInclude(loggedInUserId: string) {
   return {
     user: {
@@ -70,23 +63,15 @@ export function getPostDataInclude(loggedInUserId: string) {
   } satisfies Prisma.PostInclude;
 }
 
-// export const postDataInclude = {
-//   user: {
-//     select: userDataSelect,
-//   },
-// } satisfies Prisma.PostInclude;
-
 export type PostData = Prisma.PostGetPayload<{
   include: ReturnType<typeof getPostDataInclude>;
 }>;
 
-// used in route.ts 'for-you' server
 export interface PostsPage {
   posts: PostData[];
   nextCursor: string | null;
 }
 
-// used in route.ts 'comments' server
 export function getCommentDataInclude(loggedInUserId: string) {
   return {
     user: {
@@ -128,13 +113,11 @@ export interface NotificationsPage {
   nextCursor: string | null;
 }
 
-// used in route.ts 'followers' server
 export interface FollowerInfo {
   followers: number;
   isFollowedByUser: boolean;
 }
 
-// used in route.ts 'likes' server
 export interface LikeInfo {
   likes: number;
   isLikedByUser: boolean;
@@ -144,7 +127,6 @@ export interface BookmarkInfo {
   isBookmarkedByUser: boolean;
 }
 
-//used in route.ts 'unread-count' server
 export interface NotificationCountInfo {
   unreadCount: number;
 }
@@ -152,3 +134,13 @@ export interface NotificationCountInfo {
 export interface MessageCountInfo {
   unreadCount: number;
 }
+
+// used in route.ts 'for-you' server PostsPage
+
+// used in route.ts 'comments' server CommentDataInclude
+
+// used in route.ts 'followers' FollowerInfo server
+
+// used in route.ts 'likes' LikeInfo server
+
+//used in route.ts 'unread-count' NotificationCountInfoserver

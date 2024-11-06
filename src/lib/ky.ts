@@ -1,5 +1,6 @@
 //src/lib/ky.ts
 //Ky is a wrapper for the ky library
+
 import ky from "ky";
 
 const kyInstance = ky.create({
