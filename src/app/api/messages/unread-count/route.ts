@@ -1,9 +1,10 @@
 //src/app/api/messages/unread-count/route.ts
 //unread-count endpoint for msg
 import { validateRequest } from "@/auth";
-import prisma from "@/lib/prisma";
+import streamServerClient from "@/lib/stream";
+import { MessageCountInfo } from "@/lib/types";
 
-export async function PATCH() {
+export async function GET() {
   try {
     const { user } = await validateRequest();
 
@@ -11,17 +12,15 @@ export async function PATCH() {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.notification.updateMany({
-      where: {
-        recipientId: user.id,
-        read: false,
-      },
-      data: {
-        read: true,
-      },
-    });
+    const { total_unread_count } = await streamServerClient.getUnreadCount(
+      user.id,
+    );
 
-    return new Response();
+    const data: MessageCountInfo = {
+      unreadCount: total_unread_count,
+    };
+
+    return Response.json(data);
   } catch (error) {
     console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
