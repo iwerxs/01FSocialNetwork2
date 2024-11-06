@@ -149,6 +149,7 @@ export default function NewChatDialog({
             )}
           </div>
         </div>
+        {/* chat content between users */}
         <DialogFooter className="px-6 pb-6">
           <LoadingButton
             disabled={!selectedUsers.length}
