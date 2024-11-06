@@ -1,19 +1,16 @@
 //src/app/(main)/messages/useInitializeChatClient.ts
 
-import { useEffect, useState } from "react";
-import { useSession } from "../SessionProvider";
-import { StreamChat } from "stream-chat";
 import kyInstance from "@/lib/ky";
-import { error } from "console";
+import { useEffect, useState } from "react";
+import { StreamChat } from "stream-chat";
+import { useSession } from "../SessionProvider";
 
 export default function useInitializeChatClient() {
   const { user } = useSession();
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
 
   useEffect(() => {
-    const client = StreamChat.getInstance(
-      process.env.NEXT_PUBLIC_STREAM_API_KEY!,
-    );
+    const client = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_KEY!);
 
     client
       .connectUser(
