@@ -33,6 +33,7 @@ interface CustomChannelHeaderProps extends ChannelHeaderProps {
   openSidebar: () => void;
 }
 
+//custom chat channel header for group chats
 function CustomChannelHeader({
   openSidebar,
   ...props

@@ -34,6 +34,7 @@ export default function NewChatDialog({
   const [searchInput, setSearchInput] = useState("");
   const searchInputDebounced = useDebounce(searchInput);
 
+  // setup group chat with multiple users, an array of users
   const [selectedUsers, setSelectedUsers] = useState<
     UserResponse<DefaultStreamChatGenerics>[]
   >([]);
@@ -59,6 +60,7 @@ export default function NewChatDialog({
       ),
   });
 
+  //create a group chat channel for users
   const mutation = useMutation({
     mutationFn: async () => {
       const channel = client.channel("messaging", {
@@ -161,6 +163,7 @@ export default function NewChatDialog({
   );
 }
 
+//display user from the search
 interface UserResultProps {
   user: UserResponse<DefaultStreamChatGenerics>;
   selected: boolean;
