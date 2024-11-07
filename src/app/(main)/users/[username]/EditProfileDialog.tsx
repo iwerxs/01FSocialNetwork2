@@ -116,7 +116,7 @@ export default function EditProfileDialog({
                   <FormLabel>Bio</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell us a little bit about yourself"
+                      placeholder="What's your super power?"
                       className="resize-none"
                       {...field}
                     />
