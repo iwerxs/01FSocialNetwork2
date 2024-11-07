@@ -29,8 +29,8 @@ export default function Chat() {
           client={chatClient}
           theme={
             resolvedTheme === "dark"
-              ? "str-chat_theme-dark"
-              : "str-chat_theme-light"
+              ? "str-chat__theme-dark"
+              : "str-chat__theme-light"
           }
         >
           <ChatSidebar
