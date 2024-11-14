@@ -17,3 +17,7 @@ the above code displays the contents of the db in a new browser tab
 ## Open a new terminal window to run the application in a local development
 
 <code>npm run dev</code>
+
+the above code runs the application locally on port 3000
+
+open a brower window and navigate to <code>http://localhost:3000</code>
