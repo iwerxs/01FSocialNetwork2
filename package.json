@@ -9,6 +9,10 @@
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
+  "resolutions": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@lucia-auth/adapter-prisma": "^4.0.1",
